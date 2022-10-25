@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-10-25T14:25:38-04:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Kyle’s Technical Blog</title><subtitle>This is just a little blog I&apos;m running in the hopes of documenting the hard lessons I had to learn. I&apos;m hoping this will provide a bit of help to people on the same path as I was.</subtitle><entry><title type="html">Philosophy to Practice - Part 1 (Meeting Needs)</title><link href="http://localhost:4000/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one.html" rel="alternate" type="text/html" title="Philosophy to Practice - Part 1 (Meeting Needs)" /><published>2022-10-25T00:00:00-04:00</published><updated>2022-10-25T00:00:00-04:00</updated><id>http://localhost:4000/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one</id><content type="html" xml:base="http://localhost:4000/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one.html">&lt;h1 id=&quot;moving-from-philosophy-to-practice&quot;&gt;Moving from Philosophy to practice&lt;/h1&gt;
+
+&lt;p&gt;As a short reminder, my data science philosophy can be boiled down to &lt;strong&gt;five&lt;/strong&gt;
+main points.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Meet the needs of the end user&lt;/strong&gt; (Our focus here)&lt;/p&gt;
+
+    &lt;p&gt;&lt;strong&gt;a. Any solution must be the minimum to meet their needs&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;&lt;strong&gt;b. Any solution must be delivered on a timeline that is reasonable&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Understand the User&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Involve the User&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Understand the Environment&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Impact &amp;gt; “Cool”&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;&lt;strong&gt;a. Don’t just think about “sexy” technology&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;&lt;strong&gt;b. Ethics Matter&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;It’s important to discuss how to move from abstract philosophical tenants to
+the reality of implementation. I’m going to spend the time it takes to explain
+how I implement these points in practice. Hopefully, this is actually helpful
+for someone instead of just some high-handed moralizing.&lt;/p&gt;
+
+&lt;h4 id=&quot;meet-the-needs-of-the-end-user&quot;&gt;Meet the needs of the end User&lt;/h4&gt;
+&lt;p&gt;Since we want to provide the minimum to meet their needs, we need to first understand
+their needs. This is both simple and complex. Indeed, there is a lot written on
+the subject of going from the specifications given by a client to delivering a
+final product. At the end of the day, to me this means you have to have in-depth
+conversation(s) with the client to ensure you really understand what they need.
+I was chatting with a friend once in a different data science class who shared
+they were forging ahead with making a machine learning model for a small business
+client. His feeling was there wasn’t much value to be derived from that as the
+visualizations they had produced along the way were likely to be more impactful.
+It’s important to understand that sometimes simple is better for meeting the needs
+of the user. This requires a very clear understanding of their needs to make
+sure you actually give them what they need.&lt;/p&gt;
+
+&lt;p&gt;Part of this, is that you need to actually deliver what they need when they need
+it. That’s why delivering the minimum viable product is so important. If you
+spend too much time trying to deliver a complex solution, you may leave them in
+the cold. To avoid this, you need to understand the timeline they need a product
+in. This goes back to meeting their needs.&lt;/p&gt;
+
+&lt;h4 id=&quot;actually-meeting-their-needs--understanding-them&quot;&gt;Actually meeting their needs (&amp;amp; understanding them)&lt;/h4&gt;
+&lt;p&gt;Now how the heck can we manage this? It’s not quite so straightforward as it may
+sound. For myself, I’m perhaps overly fond of the power of conversation. While I
+am quite aware of the over-meeting phenomenon (an old idea to be sure; see “Will
+There Be Donuts” by David Pearl), I feel there are things you can’t get except
+through a conversation. I saw this as someone with some social difficulties.&lt;/p&gt;
+
+&lt;p&gt;My advice here is rooted firmly in the precepts of contextual inquiry. To that
+end, I believe the main goal is to get at the lived experiences of the clients/end
+users. This involves coming up with a set of environment specific questions. In
+general, I’d say this list of questions should cover most of what you need.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;What question are you hoping to answer or problem are you hoping to solve?&lt;/li&gt;
+  &lt;li&gt;Why is that important?&lt;/li&gt;
+  &lt;li&gt;Who are the stakeholders (who will be positively or negatively impacted)?&lt;/li&gt;
+  &lt;li&gt;What is timeline this is needed on and what is the priority level?&lt;/li&gt;
+  &lt;li&gt;How does the client fit into the organization (politically, org structure, etc)?&lt;/li&gt;
+  &lt;li&gt;How does the solution sought fit with the client and the broader environment?&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;This is just an idea of the sorts of questions I’d keep in mind as you get started.
+Ideally, if you can cover this in a half-hour, I’d do so but definitely don’t let
+the meeting last longer than an hour. Think of this as in in-take meeting. Don’t
+talk about what you can do at this point. Make sure you reflect on their needs.
+Throughout the meeting, practice active listening and don’t be afraid to ask questions.
+Most of the time, people are happy to answer questions or correct you if you’re
+getting something wrong. To me, this is where soft skills show their importance.&lt;/p&gt;</content><author><name></name></author><category term="non-technical" /><category term="musings" /><summary type="html">Moving from Philosophy to practice</summary></entry><entry><title type="html">My Data Science Philosophy</title><link href="http://localhost:4000/non-technical/musings/2022/10/24/data-science-philosophy.html" rel="alternate" type="text/html" title="My Data Science Philosophy" /><published>2022-10-24T00:00:00-04:00</published><updated>2022-10-24T00:00:00-04:00</updated><id>http://localhost:4000/non-technical/musings/2022/10/24/data-science-philosophy</id><content type="html" xml:base="http://localhost:4000/non-technical/musings/2022/10/24/data-science-philosophy.html">&lt;h1 id=&quot;data-science-philosophy&quot;&gt;Data Science Philosophy&lt;/h1&gt;
+
+&lt;p&gt;I am a simple man. I believe that ultimately, data science is about answering questions and providing value to the analytics consumer. At the end of any project, if the needs of the end analytics user aren’t being met, then we are failing in our task. This starting point is tool agnostic and fairly banal as a philosophy goes. However, this is only the beginnings of my philosophy.&lt;/p&gt;
+
+&lt;p&gt;My philosophy boils down to &lt;strong&gt;five&lt;/strong&gt; key points:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Meet the needs of the end user&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;&lt;strong&gt;a. Any solution must be the minimum to meet their needs&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;&lt;strong&gt;b. Any solution must be delivered on a timeline that is reasonable&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Understand the User&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Involve the User&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Understand the Environment&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Impact &amp;gt; “Cool”&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;&lt;strong&gt;a. Don’t just think about “sexy” technology&lt;/strong&gt;&lt;/p&gt;
+
+    &lt;p&gt;&lt;strong&gt;b. Ethics Matter&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;meet-the-needs-of-the-end-user&quot;&gt;Meet the needs of the end user&lt;/h4&gt;
+&lt;p&gt;To be successful in data science, we need to meet the needs of the end user. This means that if we aren’t answering the questions they have or supporting their work then we are failing. To that end, we need to design our processes such that they are likely to lead to success. This is especially important when we consider that a high percentage of data science projects end in &lt;a href=&quot;https://www.datascience-pm.com/project-failures/&quot;&gt;failure&lt;/a&gt;. In this environment, it’s hard to say the needs of the end user are being met if a high percentage of projects fail. A good part of this in my opinion is that these projects often suffer from scope creep and fail to match what is possible with data science.&lt;/p&gt;
+
+&lt;p&gt;Part and parcel with this is ensuring that we are meeting their needs on a reasonable timeline. Analytics delivered a long time after they are needed are neither terribly impactful nor reliable. This of course demands that the user needs to give a reasonable amount of time to meet their needs. While business and organizational needs can shift, demanding a complex analytics project be completed with a short turnaround is probably not reasonable and unlikely to succeed.&lt;/p&gt;
+
+&lt;h4 id=&quot;understand-the-user&quot;&gt;Understand the user&lt;/h4&gt;
+&lt;p&gt;For an analytics product to be impactful, it needs to meet the user where they are at. This demands that we understand the user and their needs on a deep level. Who are they, what is their level of education with analytics, what is their comfort level. All of this needs to go into designing an analytics offering that they will be capable of making use of. The “perfect” analytics solution that the user doesn’t understand (nor understand how to interact with) is hardly perfect. Thus, this is fundamentally a matter of user-centered design and following all of the best practices found within that rich tradition.&lt;/p&gt;
+
+&lt;h4 id=&quot;involve-the-user&quot;&gt;Involve the user&lt;/h4&gt;
+&lt;p&gt;For the user to be happiest, we need to make sure we’re communicating with them throughout the process of designing the analytics offering. We need to make sure they understand what we can and what we can’t do. Involvement ensures that they are most likely to get something that meets their needs, is within what we can manage while balancing demands, and perhaps most importantly, a solution that they are more likely to trust. While few environments are quite like the medical field, the growing practice for analytics within healthcare is to involve practitioners in the process of developing solutions so they can have a trust for it. This trust and understanding is important because along the way, we’ll be creating people who will act as cheerleaders for analytics within our organization. In the end, this will lead to a greater impact than we would have on our own.&lt;/p&gt;
+
+&lt;h4 id=&quot;understand-the-environment&quot;&gt;Understand the environment&lt;/h4&gt;
+&lt;p&gt;Successful analytics demands an understanding of the environment. It needs to take into account the organizational culture, the political reality, and power dynamics. It also needs to take into account extra-organizational factors. Economic, political, and regulatory pressures can have an impact and need to be taken into account. Don’t be the person who does something stupid by violating a law around data. The legal environment is an important one and while you don’t have to be a lawyer and likely aren’t, it’s important to understand what’s going on.&lt;/p&gt;
+
+&lt;h4 id=&quot;impact--cool&quot;&gt;Impact &amp;gt; “Cool”&lt;/h4&gt;
+&lt;p&gt;Impact of analytics is more important than using “cool” solutions. If a simpler model can be used with the same impact as a more complex model, then there is no need for a complex solution. Similarly, if all that is needed is a few visualizations, then making a model is overkill. Just because we can do something doesn’t mean that we should. Since our focus is on impact, we shouldn’t chase after the latest shiny toy in analytics. Because of this, my definition of data science is broader than some and includes any and all solutions to data-centric problems.&lt;/p&gt;
+
+&lt;p&gt;Going along with this idea of impact, we need to think about our impact in other ways. Ethics matters both in the present and in the future. We need to ensure our work is ethical and has the maximum positive impact on the world while minimizing our negative impact on the world. This demands that we think broadly about the impact of our offerings on all stakeholders. Analytics can have an outsized impact on people’s lives and we need to keep that in mind as we do our work. Ethics isn’t just something someone has, it’s what we do and it needs to permeate our work.&lt;/p&gt;</content><author><name></name></author><category term="non-technical" /><category term="musings" /><summary type="html">Data Science Philosophy</summary></entry></feed>

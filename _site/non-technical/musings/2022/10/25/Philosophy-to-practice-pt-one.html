@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Philosophy to Practice - Part 1 (Meeting Needs) | Kyle’s Technical Blog</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Philosophy to Practice - Part 1 (Meeting Needs)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Moving from Philosophy to practice" />
+<meta property="og:description" content="Moving from Philosophy to practice" />
+<link rel="canonical" href="http://localhost:4000/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one.html" />
+<meta property="og:url" content="http://localhost:4000/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one.html" />
+<meta property="og:site_name" content="Kyle’s Technical Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-10-25T00:00:00-04:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Philosophy to Practice - Part 1 (Meeting Needs)" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-10-25T00:00:00-04:00","datePublished":"2022-10-25T00:00:00-04:00","description":"Moving from Philosophy to practice","headline":"Philosophy to Practice - Part 1 (Meeting Needs)","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one.html"},"url":"http://localhost:4000/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Kyle&apos;s Technical Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Kyle&#39;s Technical Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/Personal_Website.html">Personal Website</a><a class="page-link" href="/LinkedIn.html">LinkedIn</a><a class="page-link" href="/portfolio.html">Portfolio</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Philosophy to Practice - Part 1 (Meeting Needs)</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-10-25T00:00:00-04:00" itemprop="datePublished">Oct 25, 2022
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h1 id="moving-from-philosophy-to-practice">Moving from Philosophy to practice</h1>
+
+<p>As a short reminder, my data science philosophy can be boiled down to <strong>five</strong>
+main points.</p>
+
+<ol>
+  <li>
+    <p><strong>Meet the needs of the end user</strong> (Our focus here)</p>
+
+    <p><strong>a. Any solution must be the minimum to meet their needs</strong></p>
+
+    <p><strong>b. Any solution must be delivered on a timeline that is reasonable</strong></p>
+  </li>
+  <li>
+    <p><strong>Understand the User</strong></p>
+  </li>
+  <li>
+    <p><strong>Involve the User</strong></p>
+  </li>
+  <li>
+    <p><strong>Understand the Environment</strong></p>
+  </li>
+  <li>
+    <p><strong>Impact &gt; “Cool”</strong></p>
+
+    <p><strong>a. Don’t just think about “sexy” technology</strong></p>
+
+    <p><strong>b. Ethics Matter</strong></p>
+  </li>
+</ol>
+
+<p>It’s important to discuss how to move from abstract philosophical tenants to
+the reality of implementation. I’m going to spend the time it takes to explain
+how I implement these points in practice. Hopefully, this is actually helpful
+for someone instead of just some high-handed moralizing.</p>
+
+<h4 id="meet-the-needs-of-the-end-user">Meet the needs of the end User</h4>
+<p>Since we want to provide the minimum to meet their needs, we need to first understand
+their needs. This is both simple and complex. Indeed, there is a lot written on
+the subject of going from the specifications given by a client to delivering a
+final product. At the end of the day, to me this means you have to have in-depth
+conversation(s) with the client to ensure you really understand what they need.
+I was chatting with a friend once in a different data science class who shared
+they were forging ahead with making a machine learning model for a small business
+client. His feeling was there wasn’t much value to be derived from that as the
+visualizations they had produced along the way were likely to be more impactful.
+It’s important to understand that sometimes simple is better for meeting the needs
+of the user. This requires a very clear understanding of their needs to make
+sure you actually give them what they need.</p>
+
+<p>Part of this, is that you need to actually deliver what they need when they need
+it. That’s why delivering the minimum viable product is so important. If you
+spend too much time trying to deliver a complex solution, you may leave them in
+the cold. To avoid this, you need to understand the timeline they need a product
+in. This goes back to meeting their needs.</p>
+
+<h4 id="actually-meeting-their-needs--understanding-them">Actually meeting their needs (&amp; understanding them)</h4>
+<p>Now how the heck can we manage this? It’s not quite so straightforward as it may
+sound. For myself, I’m perhaps overly fond of the power of conversation. While I
+am quite aware of the over-meeting phenomenon (an old idea to be sure; see “Will
+There Be Donuts” by David Pearl), I feel there are things you can’t get except
+through a conversation. I saw this as someone with some social difficulties.</p>
+
+<p>My advice here is rooted firmly in the precepts of contextual inquiry. To that
+end, I believe the main goal is to get at the lived experiences of the clients/end
+users. This involves coming up with a set of environment specific questions. In
+general, I’d say this list of questions should cover most of what you need.</p>
+
+<ol>
+  <li>What question are you hoping to answer or problem are you hoping to solve?</li>
+  <li>Why is that important?</li>
+  <li>Who are the stakeholders (who will be positively or negatively impacted)?</li>
+  <li>What is timeline this is needed on and what is the priority level?</li>
+  <li>How does the client fit into the organization (politically, org structure, etc)?</li>
+  <li>How does the solution sought fit with the client and the broader environment?</li>
+</ol>
+
+<p>This is just an idea of the sorts of questions I’d keep in mind as you get started.
+Ideally, if you can cover this in a half-hour, I’d do so but definitely don’t let
+the meeting last longer than an hour. Think of this as in in-take meeting. Don’t
+talk about what you can do at this point. Make sure you reflect on their needs.
+Throughout the meeting, practice active listening and don’t be afraid to ask questions.
+Most of the time, people are happy to answer questions or correct you if you’re
+getting something wrong. To me, this is where soft skills show their importance.</p>
+
+  </div><a class="u-url" href="/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Kyle&#39;s Technical Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Kyle&#39;s Technical Blog</li><li><a class="u-email" href="mailto:kyle@ashburn.tech">kyle@ashburn.tech</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/kyleashburn"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">kyleashburn</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>This is just a little blog I&#39;m running in the hopes of documenting the hard lessons I had to learn. I&#39;m hoping this will provide a bit of help to people on the same path as I was.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
