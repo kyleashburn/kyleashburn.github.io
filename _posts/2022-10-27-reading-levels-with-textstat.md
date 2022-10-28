@@ -24,8 +24,10 @@ the last 30 days. I had to do this manually because they strongly discourage
 using robots (they will ban your IP address).
 
 I started by combining those text files and doing a bit of light cleaning of them.
-That code is in a separate ipynb that I've uploaded and I've linked to [here]().
-I've included everything we're doing here in another ipynb located [here]().
+That code is in a separate ipynb that I've uploaded and I've linked to [here](https://github.com/kyleashburn/Blog-Code-Repo/blob/06ed002a83a64444336c29ccb7aa0e6fbb3079ed/Reading%20Levels/Making%20the%20Dataset.ipynb).
+I've included everything we're doing here in another ipynb located [here](https://github.com/kyleashburn/Blog-Code-Repo/blob/06ed002a83a64444336c29ccb7aa0e6fbb3079ed/Reading%20Levels/Getting%20the%20Reading%20Levels%20for%20each%20book.ipynb). I 
+also have everything from the resulting NDJSON to the original books from Project Gutenberg included
+[here](https://github.com/kyleashburn/Blog-Code-Repo/tree/main/Reading%20Levels).
 
 We start by reading in the data after importing our libraries.
 ```Python
