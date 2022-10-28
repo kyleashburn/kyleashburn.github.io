@@ -39,7 +39,7 @@ plugins:
 
 # this controls what pages appear on the nav bar
 header_pages:
-  - Personal_Website.markdown
+  - Personal_Website.md
   - LinkedIn.md
   - portfolio.md
 
