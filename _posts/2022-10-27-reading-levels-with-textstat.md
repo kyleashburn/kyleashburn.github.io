@@ -106,7 +106,7 @@ books["eflaw"] = books["text"].apply(ts.mcalpine_eflaw)
 books["reading_time"] = books["text"].apply(ts.reading_time, ms_per_char=16.45)
 # mean time per character per Trauzettel-Klosinski et al, 2012
 ```
-![table output](/images/reading_levels_table.jpg)
+![table output](/images/reading_levels_table.JPG)
 
 As we can see from the end result of our work here, I have some thoughts.
 I'm not sure about how well these are performing here. I don't know if Shakespeare
