@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Evaluating Topic Models - Why it’s Hard | Kyle’s Technical Blog</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Evaluating Topic Models - Why it’s Hard" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This post carries the following assumptions You are familiar with topic modeling (specifically with LDA) You are familiar with the metrics mentioned here" />
+<meta property="og:description" content="This post carries the following assumptions You are familiar with topic modeling (specifically with LDA) You are familiar with the metrics mentioned here" />
+<link rel="canonical" href="http://localhost:4000/topic%20modeling/non-technical/2022/10/26/Topic-Model-Evaluation.html" />
+<meta property="og:url" content="http://localhost:4000/topic%20modeling/non-technical/2022/10/26/Topic-Model-Evaluation.html" />
+<meta property="og:site_name" content="Kyle’s Technical Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-10-26T00:00:00-04:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Evaluating Topic Models - Why it’s Hard" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-10-26T00:00:00-04:00","datePublished":"2022-10-26T00:00:00-04:00","description":"This post carries the following assumptions You are familiar with topic modeling (specifically with LDA) You are familiar with the metrics mentioned here","headline":"Evaluating Topic Models - Why it’s Hard","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/topic%20modeling/non-technical/2022/10/26/Topic-Model-Evaluation.html"},"url":"http://localhost:4000/topic%20modeling/non-technical/2022/10/26/Topic-Model-Evaluation.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Kyle&apos;s Technical Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Kyle&#39;s Technical Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/Personal_Website.html">Personal Website</a><a class="page-link" href="/LinkedIn.html">LinkedIn</a><a class="page-link" href="/portfolio.html">Portfolio</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Evaluating Topic Models - Why it&#39;s Hard</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-10-26T00:00:00-04:00" itemprop="datePublished">Oct 26, 2022
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><strong>This post carries the following assumptions</strong></p>
+<ol>
+  <li>You are familiar with topic modeling (specifically with LDA)</li>
+  <li>You are familiar with the metrics mentioned here</li>
+</ol>
+
+<p>As such, I will <strong>not</strong> be going over them except in the most cursory way. Indeed,
+the main focus here is why this is a hard task. I’ll follow up with evaluating in practice.</p>
+
+<h1 id="topic-model-evaluation-optimal-k">Topic Model Evaluation (optimal K)</h1>
+<p>This is a topic I found ridiculously difficult to find information on. Whether
+in the literature, or online. On a conceptual level, this isn’t terribly surprising.
+When you ask how to find the optimal number of topics, of course it will be difficult.
+<strong>If you spot a glaring error, please feel free to email me about it and I will fix it.
+Please forgive me if it seems as if I’m pontificating here; it’s something I’m
+passionate about.</strong></p>
+
+<p>As a thought exercise, let’s think about the following sentences:</p>
+<blockquote>
+  <p>“John went to the State Fair with Wenya. While there they rode rides, ate food,
+played games, and checked out the booths. They had such a great time, they decided they should go again next
+year.”</p>
+</blockquote>
+
+<p>How many topics would you say there are? That’s not an easy question from a human
+standpoint. You could come up with a number of different topics…and while they
+aren’t all equally valid (let’s say the topic of Politics for instance), there
+isn’t just one answer. In general, if we as humans struggle with something with
+consistency, it will prove difficult to do that same thing with a computer.</p>
+
+<p>Let’s think about how LDA works for a second. LDA assumes that documents are a
+mixture of topic probabilities. Or in human terms, any document <em>could</em> be a number
+of topics. That makes things a bit messy for us. While the most probable label
+will end up applied, there are still likely to be many labels vying for the honor
+of being applied to a given document. This is important for us because, it is this
+uncertainty that arguable reflects the same human issues here. If you run LDA
+5 times, you will be technically getting back 5 different models.</p>
+
+<p>Let’s think of those models as different people. Different people with different
+ways of seeing the world. They have different boundaries for deciding what topics
+exist. So these different models (like people) will give different labels. This
+means that over a corpus of documents, they may well have different ideas of the
+number of topics. Does our problem begin to get clearer?</p>
+
+<p>Of course, as part of LDA, we set the number of topics at the start. This forces
+the application of the best label (even if it’s terrible). We can set and test
+a number of K values and see how they turn out according to a number of metrics.
+Now, as someone working with topic modeling, I would <strong><em>love</em></strong> if we could have
+a nice clean answer to how to find optimal K. Unfortunately, we can’t.</p>
+
+<p>This is because there isn’t exactly just one optimal K value (bear with me here).
+If you think in terms of finding just one value, you’re going to struggle. That’s
+why I prefer to think of it as a matter of finding several different “Keighborhoods”
+(K neighborhoods; pardon my puniness).</p>
+
+<p>Let’s pivot away from topic modeling for a moment and think of library catalogues.
+Categorizing books by topic is quite complicated. That’s why most classification
+schemes will have subcategories. So let’s say you have a copy of Murach’s MySQL,
+now under the Library of Congress system, it has a classification of QA76.9.D32 M846 2015.
+The Q means it falls under science, the QA means it falls under Mathematics, the
+76 puts it under instruments and machines.
+For more, see the classification outline <a href="https://www.loc.gov/catdir/cpso/lcco/">here</a>.</p>
+
+<p>This little aside, serves to illustrate that classification can be (and often is)
+hierarchical in the real world. Thus, topics can have subtopics. It all depends
+on the level of granularity you’re looking for. Thus, while LDA doesn’t have
+subtopics built in, by increasing K, you are increasing the granularity of the
+topics.</p>
+
+<p>Why does this matter? It’s important because of the idea of multiple values of K
+that <em>could</em> apply. Because there are a couple of K value ranges which make sense
+(because) of the subtopics that can occur, you don’t have just one area to look
+at. In theory, if you wanted to, you could probably go to many thousands of topics
+and be super granular. And that would be totally fine if your goal is to have a
+machine use the labels in some way. However, if you want to have people understand
+and interpret those…it becomes problematic.</p>
+
+<h1 id="internal-metrics">(Internal) Metrics</h1>
+<p>Let’s think about metrics and evaluation for a minute. Our goal with topic
+modeling is to try to represent a corpus of documents in a richer way than mere
+term frequency. Thus, ideally, our topic models should represent the corpus
+accurately <strong><em>and</em></strong> be solidly human-interpretable. There are a number of different
+metrics we can look at for this but they all measure different things. Some of them
+are actually <em>negatively</em> correlated with human-interpretability. That means we
+can have a perfectly good topic model (from the metrics) with topics that seem
+like garbage to a human.</p>
+
+<p>This is why one of the most common pieces of advice you will see online is to
+look at each of the topics generated to see if it makes sense. And I tend to agree,
+the most important metric is expert human opinion. However, this isn’t workable
+at scale. That probably explains why so many research papers I read tried only
+a few (or even only 1) value(s) for K. That unwieldiness at scale is why I think
+metrics have a place. Even with their difficulties.</p>
+
+<p>One of the concepts you’ll hear bandied about is the elbow method (or gap statistic).
+This is considered to be broadly applicable across clustering techniques (which
+topic modeling could be considered). I’m not entirely sure that it has had a
+robust analysis of its effectiveness conducted so I tend to shy away from it.
+Further, there are few implementations within Python of it and they carry…their
+own issues. Thus, I am not overly fond of it.</p>
+
+<p>If we look at other metrics, we want to focus on Internal Metrics. This is because
+if we don’t know the ground truth of topics (and most of the time we won’t) these
+are important. These metrics can include Silhouette Coefficients, Calinski-Harabasz,
+among others. I think <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9040385/pdf/nihms-1704563.pdf">Lossio-Ventura et al. 2021</a> provides a decent coverage of some of these (mainly Silhouette Coefficients
+and Calinski-Harabasz). <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9049322/">Rudiger et al. 2022</a>
+provide an excellent overview of topic modeling metrics such as perplexity and
+coherence. Of course, these internal metrics don’t necessarily lead to the best
+human-interpretable topics as they are focused on the goodness of the clusters.
+Indeed, Rudiger et al. 2022 note the research showing that perplexity doesn’t correlate
+with human interpretability. These metrics are not all equally effective across
+all methods. Further, the data itself can impact the effectiveness of the metric.
+This demands a solid understanding of what metric to use where, which is something
+ hard to find in the literature in my experience. Thus, my preference is to use
+ multiple metrics, try a number of K values, and find Keighborhoods to investigate
+ further by looking at the topics formed. This should be clearer with my follow-up
+ post where I’ll show how I’ve done it in the past.</p>
+
+  </div><a class="u-url" href="/topic%20modeling/non-technical/2022/10/26/Topic-Model-Evaluation.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Kyle&#39;s Technical Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Kyle&#39;s Technical Blog</li><li><a class="u-email" href="mailto:kyle@ashburn.tech">kyle@ashburn.tech</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/kyleashburn"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">kyleashburn</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>This is just a little blog I&#39;m running in the hopes of documenting the hard lessons I had to learn. I&#39;m hoping this will provide a bit of help to people on the same path as I was.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

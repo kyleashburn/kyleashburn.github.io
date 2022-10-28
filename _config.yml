@@ -25,6 +25,10 @@ description: >- # this means to ignore newlines until "baseurl:"
   lessons I had to learn. I'm hoping this will provide a bit of help to people
   on the same path as I was.
 
+# I'll need to figure this stuff out late on I fear to be able to deploy
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
+
 email: kyle@ashburn.tech
 github_username: kyleashburn
 
@@ -35,10 +39,9 @@ plugins:
 
 # this controls what pages appear on the nav bar
 header_pages:
-  - Personal_Website.md
+  - Personal_Website.markdown
   - LinkedIn.md
   - portfolio.md
-  - test.md
 
 
 # Exclude from processing.

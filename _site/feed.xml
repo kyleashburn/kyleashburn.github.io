@@ -1,4 +1,507 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-10-25T14:25:38-04:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Kyle’s Technical Blog</title><subtitle>This is just a little blog I&apos;m running in the hopes of documenting the hard lessons I had to learn. I&apos;m hoping this will provide a bit of help to people on the same path as I was.</subtitle><entry><title type="html">Philosophy to Practice - Part 1 (Meeting Needs)</title><link href="http://localhost:4000/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one.html" rel="alternate" type="text/html" title="Philosophy to Practice - Part 1 (Meeting Needs)" /><published>2022-10-25T00:00:00-04:00</published><updated>2022-10-25T00:00:00-04:00</updated><id>http://localhost:4000/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one</id><content type="html" xml:base="http://localhost:4000/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one.html">&lt;h1 id=&quot;moving-from-philosophy-to-practice&quot;&gt;Moving from Philosophy to practice&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-10-27T20:47:25-04:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Kyle’s Technical Blog</title><subtitle>This is just a little blog I&apos;m running in the hopes of documenting the hard lessons I had to learn. I&apos;m hoping this will provide a bit of help to people on the same path as I was.</subtitle><entry><title type="html">Reading Levels with Textstat</title><link href="http://localhost:4000/technical/textual%20data/2022/10/27/reading-levels-with-textstat.html" rel="alternate" type="text/html" title="Reading Levels with Textstat" /><published>2022-10-27T00:00:00-04:00</published><updated>2022-10-27T00:00:00-04:00</updated><id>http://localhost:4000/technical/textual%20data/2022/10/27/reading-levels-with-textstat</id><content type="html" xml:base="http://localhost:4000/technical/textual%20data/2022/10/27/reading-levels-with-textstat.html">&lt;h1 id=&quot;reading-levels-with-textstat&quot;&gt;Reading Levels with Textstat&lt;/h1&gt;
+&lt;p&gt;There are lot of things you can do with textual data. You can do topic modeling,
+PoS tagging, sentiment analysis, stylometry, and term frequency. Something else
+you can do is reading level analysis. Now, most of the time, this might not have
+too much utility. However, you might find it a useful feature in feature engineering.&lt;/p&gt;
+
+&lt;p&gt;One of the nice Python libraries I found for calculating reading levels is Textstat.
+There are a number of different tutorials on this topic and to be honest, I can’t
+say that they are insufficient. Indeed, the documentation for Textstat answers
+most questions you could have in terms of use. However, I thought it would be nice
+for me to write up my own little guide to the subject because I’ve noticed a few
+things.&lt;/p&gt;
+
+&lt;p&gt;Throughout this, I’m using 10 ebooks I
+downloaded from the Guttenberg Project. I chose the 10 most popular books over
+the last 30 days. I had to do this manually because they strongly discourage
+using robots (they will ban your IP address).&lt;/p&gt;
+
+&lt;p&gt;I started by combining those text files and doing a bit of light cleaning of them.
+That code is in a separate ipynb that I’ve uploaded and I’ve linked to &lt;a href=&quot;&quot;&gt;here&lt;/a&gt;.
+I’ve included everything we’re doing here in another ipynb located &lt;a href=&quot;&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;We start by reading in the data after importing our libraries.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;import pandas as pd
+import textstat as ts
+
+books = pd.read_json(&quot;top-10-projbg-books.ndjson&quot;, lines=True)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Our first thing we’re going to check is the Flesch Reading Ease Score and Flesch
+Kincaid Grade Level (based off the Flesch Reading Ease). You can read more about
+them &lt;a href=&quot;https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests&quot;&gt;on Wikipedia&lt;/a&gt;,
+but they were originally meant to provide a way for evaluating textbooks.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;%%time
+books[&quot;fl_ease&quot;] = books[&quot;text&quot;].apply(ts.flesch_reading_ease)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;%%time
+books[&quot;fl_kn_grd&quot;] = books[&quot;text&quot;].apply(ts.flesch_kincaid_grade)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Our next two measures work differently and have different assumptions. They try
+to represent the years of education it would take to read a work. The &lt;a href=&quot;https://en.wikipedia.org/wiki/Gunning_fog_index&quot;&gt;Gunning fog
+index&lt;/a&gt; and the &lt;a href=&quot;https://en.wikipedia.org/wiki/SMOG&quot;&gt;SMOG grade&lt;/a&gt;
+. These are both actually better measures than Flesch based scores when it comes
+to some cases. Generally, they perform better with healthcare texts. Though, I suspect
+a good bit of that is because they consistently return higher levels in my experience.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;%%time
+books[&quot;gunning&quot;] = books[&quot;text&quot;].apply(ts.gunning_fog)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;%%time
+books[&quot;smog&quot;] = books[&quot;text&quot;].apply(ts.smog_index)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Our next two measures are different still. &lt;a href=&quot;https://en.wikipedia.org/wiki/Automated_readability_index&quot;&gt;Automated Readability Index&lt;/a&gt; is computed on a per-character basis
+while the &lt;a href=&quot;https://en.wikipedia.org/wiki/Dale%E2%80%93Chall_readability_formula&quot;&gt;Dale-Chall&lt;/a&gt; involves a list of “easy” words. Both result in an approximate grade level of a text.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;%%time
+books[&quot;ari&quot;] = books[&quot;text&quot;].apply(ts.automated_readability_index)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;%%time
+books[&quot;dale_chall&quot;] = books[&quot;text&quot;].apply(ts.dale_chall_readability_score)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The final readability measure is an ensemble measure that is unique to Textstat.
+I think it can be useful on occasion, though it is considerably slower than the
+other options (since it runs all of them).&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;%%time
+books[&quot;ensemble&quot;] = books[&quot;text&quot;].apply(ts.text_standard, float_output=True)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;other-metrics&quot;&gt;Other Metrics&lt;/h1&gt;
+&lt;p&gt;There are two other metrics that Textstat has set up. One of those is the &lt;a href=&quot;https://www.angelfire.com/nd/nirmaldasan/journalismonline/fpetge.html&quot;&gt;McAlpine
+EFLAW&lt;/a&gt; score
+that is meant to measure readability for a person who isn’t a native English
+speaker. The other is a reading speed calculated on a per character basis. Now I
+have concerns about the validity of the reading speed and think it’s too optimistic.
+Furthermore, it’s difficult to determine what the per-character speed should be.
+For myself, I relied on &lt;a href=&quot;https://iovs.arvojournals.org/article.aspx?articleid=2166061&quot;&gt;Trauzettel-Klosinski et al, 2012&lt;/a&gt; and went with 16.45 ms per character. In this case,
+the documentation isn’t clear, but the end result is in seconds to read the work.
+I had to read through the repo to figure that part out.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;%%time
+books[&quot;eflaw&quot;] = books[&quot;text&quot;].apply(ts.mcalpine_eflaw)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;%%time
+books[&quot;reading_time&quot;] = books[&quot;text&quot;].apply(ts.reading_time, ms_per_char=16.45)
+# mean time per character per Trauzettel-Klosinski et al, 2012
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;/images/reading_levels_table.jpg&quot; alt=&quot;table output&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As we can see from the end result of our work here, I have some thoughts.
+I’m not sure about how well these are performing here. I don’t know if Shakespeare
+is actually at the 6th grade level in general. I’m especially unsure about the Dale-Chall
+score of 1.2 which would indicate an average 4th grader can easily understand it.
+Of course, these shouldn’t be relied on as a gold standard but rather a hint of a
+direction that things might be.&lt;/p&gt;
+
+&lt;p&gt;Different formulas lead to different results unsurprising to think about. Thus,
+in this case, the text standard is probably our best bet. This is because it is
+rooted in finding the consensus of the scores. Of course, “best” is probably a
+ bit ambiguous in a lot of respects. For one thing, the metric needs to be one that
+ is understood and accepted. For another, it needs to be one that is considered
+ reliable. It’s important to understand the context which exists for each of these
+ metrics.&lt;/p&gt;
+
+&lt;p&gt;The usual Flesch-Kincaid formula can overestimate readability in certain contexts.
+ The SMOG index is better used for technical documents in a lot of respects and
+  is popular in assessing the readability of health documents. However, syllable
+  based readability tests have their own issues, short words may confuse people
+  if they are rare. Other approaches can be found in the Dale-Chall formula that
+  has a list of words that 4th grade students can understand and anything off the
+  list is considered difficult. In general though, any metric here is probably a
+  “good enough” metric in general. Specific use cases require specific testing to
+  ensure reliability and validity of a measure.&lt;/p&gt;</content><author><name></name></author><category term="technical" /><category term="textual data" /><summary type="html">Reading Levels with Textstat There are lot of things you can do with textual data. You can do topic modeling, PoS tagging, sentiment analysis, stylometry, and term frequency. Something else you can do is reading level analysis. Now, most of the time, this might not have too much utility. However, you might find it a useful feature in feature engineering.</summary></entry><entry><title type="html">Evaluating Topic Models - Why it’s Hard</title><link href="http://localhost:4000/topic%20modeling/non-technical/2022/10/26/Topic-Model-Evaluation.html" rel="alternate" type="text/html" title="Evaluating Topic Models - Why it’s Hard" /><published>2022-10-26T00:00:00-04:00</published><updated>2022-10-26T00:00:00-04:00</updated><id>http://localhost:4000/topic%20modeling/non-technical/2022/10/26/Topic-Model-Evaluation</id><content type="html" xml:base="http://localhost:4000/topic%20modeling/non-technical/2022/10/26/Topic-Model-Evaluation.html">&lt;p&gt;&lt;strong&gt;This post carries the following assumptions&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;You are familiar with topic modeling (specifically with LDA)&lt;/li&gt;
+  &lt;li&gt;You are familiar with the metrics mentioned here&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;As such, I will &lt;strong&gt;not&lt;/strong&gt; be going over them except in the most cursory way. Indeed,
+the main focus here is why this is a hard task. I’ll follow up with evaluating in practice.&lt;/p&gt;
+
+&lt;h1 id=&quot;topic-model-evaluation-optimal-k&quot;&gt;Topic Model Evaluation (optimal K)&lt;/h1&gt;
+&lt;p&gt;This is a topic I found ridiculously difficult to find information on. Whether
+in the literature, or online. On a conceptual level, this isn’t terribly surprising.
+When you ask how to find the optimal number of topics, of course it will be difficult.
+&lt;strong&gt;If you spot a glaring error, please feel free to email me about it and I will fix it.
+Please forgive me if it seems as if I’m pontificating here; it’s something I’m
+passionate about.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;As a thought exercise, let’s think about the following sentences:&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;“John went to the State Fair with Wenya. While there they rode rides, ate food,
+played games, and checked out the booths. They had such a great time, they decided they should go again next
+year.”&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;How many topics would you say there are? That’s not an easy question from a human
+standpoint. You could come up with a number of different topics…and while they
+aren’t all equally valid (let’s say the topic of Politics for instance), there
+isn’t just one answer. In general, if we as humans struggle with something with
+consistency, it will prove difficult to do that same thing with a computer.&lt;/p&gt;
+
+&lt;p&gt;Let’s think about how LDA works for a second. LDA assumes that documents are a
+mixture of topic probabilities. Or in human terms, any document &lt;em&gt;could&lt;/em&gt; be a number
+of topics. That makes things a bit messy for us. While the most probable label
+will end up applied, there are still likely to be many labels vying for the honor
+of being applied to a given document. This is important for us because, it is this
+uncertainty that arguable reflects the same human issues here. If you run LDA
+5 times, you will be technically getting back 5 different models.&lt;/p&gt;
+
+&lt;p&gt;Let’s think of those models as different people. Different people with different
+ways of seeing the world. They have different boundaries for deciding what topics
+exist. So these different models (like people) will give different labels. This
+means that over a corpus of documents, they may well have different ideas of the
+number of topics. Does our problem begin to get clearer?&lt;/p&gt;
+
+&lt;p&gt;Of course, as part of LDA, we set the number of topics at the start. This forces
+the application of the best label (even if it’s terrible). We can set and test
+a number of K values and see how they turn out according to a number of metrics.
+Now, as someone working with topic modeling, I would &lt;strong&gt;&lt;em&gt;love&lt;/em&gt;&lt;/strong&gt; if we could have
+a nice clean answer to how to find optimal K. Unfortunately, we can’t.&lt;/p&gt;
+
+&lt;p&gt;This is because there isn’t exactly just one optimal K value (bear with me here).
+If you think in terms of finding just one value, you’re going to struggle. That’s
+why I prefer to think of it as a matter of finding several different “Keighborhoods”
+(K neighborhoods; pardon my puniness).&lt;/p&gt;
+
+&lt;p&gt;Let’s pivot away from topic modeling for a moment and think of library catalogues.
+Categorizing books by topic is quite complicated. That’s why most classification
+schemes will have subcategories. So let’s say you have a copy of Murach’s MySQL,
+now under the Library of Congress system, it has a classification of QA76.9.D32 M846 2015.
+The Q means it falls under science, the QA means it falls under Mathematics, the
+76 puts it under instruments and machines.
+For more, see the classification outline &lt;a href=&quot;https://www.loc.gov/catdir/cpso/lcco/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;This little aside, serves to illustrate that classification can be (and often is)
+hierarchical in the real world. Thus, topics can have subtopics. It all depends
+on the level of granularity you’re looking for. Thus, while LDA doesn’t have
+subtopics built in, by increasing K, you are increasing the granularity of the
+topics.&lt;/p&gt;
+
+&lt;p&gt;Why does this matter? It’s important because of the idea of multiple values of K
+that &lt;em&gt;could&lt;/em&gt; apply. Because there are a couple of K value ranges which make sense
+(because) of the subtopics that can occur, you don’t have just one area to look
+at. In theory, if you wanted to, you could probably go to many thousands of topics
+and be super granular. And that would be totally fine if your goal is to have a
+machine use the labels in some way. However, if you want to have people understand
+and interpret those…it becomes problematic.&lt;/p&gt;
+
+&lt;h1 id=&quot;internal-metrics&quot;&gt;(Internal) Metrics&lt;/h1&gt;
+&lt;p&gt;Let’s think about metrics and evaluation for a minute. Our goal with topic
+modeling is to try to represent a corpus of documents in a richer way than mere
+term frequency. Thus, ideally, our topic models should represent the corpus
+accurately &lt;strong&gt;&lt;em&gt;and&lt;/em&gt;&lt;/strong&gt; be solidly human-interpretable. There are a number of different
+metrics we can look at for this but they all measure different things. Some of them
+are actually &lt;em&gt;negatively&lt;/em&gt; correlated with human-interpretability. That means we
+can have a perfectly good topic model (from the metrics) with topics that seem
+like garbage to a human.&lt;/p&gt;
+
+&lt;p&gt;This is why one of the most common pieces of advice you will see online is to
+look at each of the topics generated to see if it makes sense. And I tend to agree,
+the most important metric is expert human opinion. However, this isn’t workable
+at scale. That probably explains why so many research papers I read tried only
+a few (or even only 1) value(s) for K. That unwieldiness at scale is why I think
+metrics have a place. Even with their difficulties.&lt;/p&gt;
+
+&lt;p&gt;One of the concepts you’ll hear bandied about is the elbow method (or gap statistic).
+This is considered to be broadly applicable across clustering techniques (which
+topic modeling could be considered). I’m not entirely sure that it has had a
+robust analysis of its effectiveness conducted so I tend to shy away from it.
+Further, there are few implementations within Python of it and they carry…their
+own issues. Thus, I am not overly fond of it.&lt;/p&gt;
+
+&lt;p&gt;If we look at other metrics, we want to focus on Internal Metrics. This is because
+if we don’t know the ground truth of topics (and most of the time we won’t) these
+are important. These metrics can include Silhouette Coefficients, Calinski-Harabasz,
+among others. I think &lt;a href=&quot;https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9040385/pdf/nihms-1704563.pdf&quot;&gt;Lossio-Ventura et al. 2021&lt;/a&gt; provides a decent coverage of some of these (mainly Silhouette Coefficients
+and Calinski-Harabasz). &lt;a href=&quot;https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9049322/&quot;&gt;Rudiger et al. 2022&lt;/a&gt;
+provide an excellent overview of topic modeling metrics such as perplexity and
+coherence. Of course, these internal metrics don’t necessarily lead to the best
+human-interpretable topics as they are focused on the goodness of the clusters.
+Indeed, Rudiger et al. 2022 note the research showing that perplexity doesn’t correlate
+with human interpretability. These metrics are not all equally effective across
+all methods. Further, the data itself can impact the effectiveness of the metric.
+This demands a solid understanding of what metric to use where, which is something
+ hard to find in the literature in my experience. Thus, my preference is to use
+ multiple metrics, try a number of K values, and find Keighborhoods to investigate
+ further by looking at the topics formed. This should be clearer with my follow-up
+ post where I’ll show how I’ve done it in the past.&lt;/p&gt;</content><author><name></name></author><category term="topic modeling" /><category term="non-technical" /><summary type="html">This post carries the following assumptions You are familiar with topic modeling (specifically with LDA) You are familiar with the metrics mentioned here</summary></entry><entry><title type="html">Evaluating Topic Models - In Practice</title><link href="http://localhost:4000/topic%20modeling/technical/2022/10/26/Evaluating-Topic-Models-pt-2.html" rel="alternate" type="text/html" title="Evaluating Topic Models - In Practice" /><published>2022-10-26T00:00:00-04:00</published><updated>2022-10-26T00:00:00-04:00</updated><id>http://localhost:4000/topic%20modeling/technical/2022/10/26/Evaluating-Topic-Models-pt-2</id><content type="html" xml:base="http://localhost:4000/topic%20modeling/technical/2022/10/26/Evaluating-Topic-Models-pt-2.html">&lt;p&gt;Having already talked about why it’s hard to evaluate topic models, I wanted to
+walk through how I’ve ended up evaluating topic models when I’ve made them myself.
+This is from a project I’m still working on and I’m not sure it’s ethical for me
+to share the data, but the code can be easily repurposed. I’ll share the link to
+an ipynb with all of the code I used.&lt;/p&gt;
+
+&lt;h4 id=&quot;caveat&quot;&gt;Caveat&lt;/h4&gt;
+&lt;p&gt;This is all done with SKLearn’s LDA implementation so it goes without saying
+that you can’t just plug this all into say Gensim’s approach and use it without
+any modification.&lt;/p&gt;
+
+&lt;h4 id=&quot;warnings&quot;&gt;Warning(s)&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;This is an incredibly slow process. Don’t expect it to be fast, especially on
+larger data.&lt;/strong&gt; You have been warned.&lt;/p&gt;
+
+&lt;p&gt;Because this is from a personal project where I have to keep the data private,
+I can’t share the data. Thus, you can’t follow along with me. I’m planning on
+finding (or making) a good public dataset that I write another post about so you
+can follow along.&lt;/p&gt;
+
+&lt;h4 id=&quot;starting-with-the-first-imports-and-why&quot;&gt;Starting with the first imports and why&lt;/h4&gt;
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;import pandas as pd
+import numpy as np
+from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We’re using Pandas as the wrapper for the handling the data. We’re bringing
+Numpy to be safe because I believe it’s better to have it than not. Then we’ve
+got the SKLearn LDA and vectorizers.&lt;/p&gt;
+
+&lt;h4 id=&quot;the-horribly-messy-pre-processing-step&quot;&gt;The horribly messy pre-processing step&lt;/h4&gt;
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;import string
+punct = string.punctuation
+punct = punct.replace(&quot;#&quot;, &quot;‘&quot;)
+ #removing hashtag and replacing with a stray type of apostrophe that broke through
+
+import nltk
+from nltk.stem import WordNetLemmatizer
+wordnet_lemmatizer = WordNetLemmatizer()
+stopwords = nltk.corpus.stopwords.words(&quot;english&quot;)
+import contractions
+
+# defining a pre-proc function that will tokenize text
+def pre_proc(x):
+    # splitting contractions before splitting up the terms =&amp;gt; helps with pruning
+    # trying to expand the contractions
+    try:    
+        x = contractions.fix(x)
+
+    # if that fails, trying to use unidecode to correct
+    except IndexError:
+        # trying to unidecode
+        try:
+            x = contractions.fix(unidecode(x))
+
+        except Exception as eror: # printing excpetion, and input leading to that
+            print(&quot;Exception is:&quot;, error)
+            print(&quot;Exception on:&quot;)
+            print(x)        
+
+    x = x.split() # splitting the terms up
+
+    x = [word for word in x if len(word)&amp;gt;0] # removing the empty items
+
+    x = [word.lower() for word in x] # lowercasing the terms
+
+    # removing emoji &amp;amp; conveniently, some punctuation
+    x = [word.encode(&quot;ascii&quot;, &quot;ignore&quot;).decode(&quot;ascii&quot;) for word in x]
+
+    # removing punctuation (with the exception of #)
+    x = [word.translate(str.maketrans(&quot;&quot;,&quot;&quot;,punct)) for word in x]    
+
+
+    x = [word for word in x if len(word)&amp;gt;0] # removing the empty items
+
+    x = [word for word in x if word not in stopwords]     # removing stopwords
+
+    x = [wordnet_lemmatizer.lemmatize(word) for word in x]     # lemmatization
+
+    x = &quot; &quot;.join(x)      # rejoining the list back into a string   
+
+    return x
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is kinda messy but it’s what I’ve used on multiple occasions. It works for
+my purposes here and it worked in my masters paper. The main thing to note is we
+want to return a string that has been cleaned because that’s what it takes to
+ensure some of the metrics work properly.&lt;/p&gt;
+
+&lt;h4 id=&quot;running-the-pre-processing-reading-data-vectorizing&quot;&gt;Running the pre-processing, reading data, vectorizing&lt;/h4&gt;
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;chapters = pd.read_json(&quot;book_chapters.jl&quot;, lines=True) # reading data
+
+chapters[&quot;clean&quot;] = chapters[&quot;chapt_text&quot;].apply(pre_proc)
+
+tf_vectorizer = CountVectorizer(
+    max_df=0.95, min_df=.1, stop_words=&quot;english&quot;
+)
+
+tf = tf_vectorizer.fit_transform(chapters[&quot;clean&quot;])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;setting-everything-up-to-search-for-optimal-k&quot;&gt;Setting everything up to search for optimal K&lt;/h4&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;k_vals&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;15&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;18&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;21&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;25&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;30&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;35&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;40&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# decent spread of k-vals
+&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# making lists to hold the scores for each of these topic model values
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;perp_scores&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ll_scores&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;silh_scores&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ch_scores&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;coh_umass_scores&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;coh_c_v_scores&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;coh_c_uci_scores&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;coh_c_npmi_scores&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;tokens&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;chapters&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;clean&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;apply&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# we need this for one of the metrics
+&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;time&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# we need this to ensure we have all the timings
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;running-multiple-lda-models-and-getting-the-metrics-for-search&quot;&gt;Running multiple LDA models and getting the metrics for search&lt;/h4&gt;
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;# importing our metrics
+from sklearn.metrics import silhouette_score
+from sklearn.metrics import calinski_harabasz_score
+from tmtoolkit.topicmod.evaluate import metric_coherence_gensim
+
+
+start_time = time.time()  #timing is everything
+
+for k in k_vals:
+    loop_start = time.time()
+    lda = LatentDirichletAllocation(n_components=k, random_state=0, n_jobs=5) # making our lda model
+
+    lda.fit(tf) # fitting it to our tf
+
+    # getting our labels for the silhouette score and CH
+    labels = lda.transform(tf)
+    doc_labels = [label.argmax() for label in labels] # list comp which gives labels for each doc
+
+    # getting our metrics next
+    perp_scores.append(lda.perplexity(tf))
+    ll_scores.append(lda.score(tf))
+    silh_scores.append(silhouette_score(tf, doc_labels))
+    ch_scores.append(calinski_harabasz_score(tf.toarray(), doc_labels))
+
+    # coherence scores
+    coh_umass_scores.append(metric_coherence_gensim(measure=&apos;u_mass&apos;, # the measure we&apos;re using
+                        top_n=25,
+                        topic_word_distrib=lda.components_, # the components of the lda count as
+                        dtm=tf, # the term frequency
+                        vocab=np.array([x for x in tf_vectorizer.vocabulary_.keys()]), # pass in vectorizer
+                        texts=tokens, # pass in list of tokenized texts -&amp;gt; needs to match vocab -&amp;gt; if using umass, doesn&apos;t matter at all
+                        return_mean=True)) # return the mean coherence score for the model
+
+    coh_c_v_scores.append(metric_coherence_gensim(measure=&apos;c_v&apos;, # the measure we&apos;re using
+                        top_n=25,
+                        topic_word_distrib=lda.components_, # the components of the lda count as
+                        dtm=tf, # the term frequency
+                        vocab=np.array([x for x in tf_vectorizer.vocabulary_.keys()]), # pass in vectorizer
+                        texts=tokens, # pass in list of tokenized texts -&amp;gt; needs to match vocab -&amp;gt; if using umass, doesn&apos;t matter at all
+                        return_mean=True))
+
+    coh_c_uci_scores.append(metric_coherence_gensim(measure=&apos;c_uci&apos;, # the measure we&apos;re using
+                        top_n=25,
+                        topic_word_distrib=lda.components_, # the components of the lda count as
+                        dtm=tf, # the term frequency
+                        vocab=np.array([x for x in tf_vectorizer.vocabulary_.keys()]), # pass in vectorizer
+                        texts=tokens, # pass in list of tokenized texts -&amp;gt; needs to match vocab -&amp;gt; if using umass, doesn&apos;t matter at all
+                        return_mean=True))
+
+    coh_c_npmi_scores.append(metric_coherence_gensim(measure=&apos;c_npmi&apos;, # the measure we&apos;re using
+                        top_n=25,
+                        topic_word_distrib=lda.components_, # the components of the lda count as
+                        dtm=tf, # the term frequency
+                        vocab=np.array([x for x in tf_vectorizer.vocabulary_.keys()]), # pass in vectorizer
+                        texts=tokens, # pass in list of tokenized texts -&amp;gt; needs to match vocab -&amp;gt; if using umass, doesn&apos;t matter at all
+                        return_mean=True))
+
+
+
+    loop_end = time.time()
+    print(&quot;loop took&quot;, loop_end - loop_start, &quot;seconds to run&quot;)
+end_time = time.time()
+
+print(&quot;total time&quot;, end_time - start_time, &quot;seconds&quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I know that’s a bit messy and my comments mean that it doesn’t all fit on there,
+but the gist is we’re going through and grabbing the metrics for each time we
+build an LDA topic model.&lt;/p&gt;
+
+&lt;h4 id=&quot;comparing-the-results&quot;&gt;Comparing the results&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;import matplotlib.pyplot as plt
+
+plt.rcParams[&apos;figure.dpi&apos;] = 150 # ensuring we have a good size for vectorizers
+
+fig, axs = plt.subplots(4, 2)
+fig.suptitle(&quot;Metrics vs. K&quot;)
+fig.tight_layout(pad=1.5)
+
+
+axs[0,0].plot(k_vals, perp_scores, &quot;blue&quot;, label=&quot;perplexity&quot;)
+axs[0,0].set_title(&quot;perplexity&quot;)
+
+axs[0,1].plot(k_vals, ll_scores, &quot;red&quot;, label=&quot;log likliehood&quot;)
+axs[0,1].set_title(&quot;log likliehood&quot;)
+
+axs[1,0].plot(k_vals, silh_scores, &quot;Orange&quot; , label= &quot;silhouette score&quot;)
+axs[1,0].set_title(&quot;silhouette score&quot;)
+
+axs[1,1].plot(k_vals, ch_scores, &quot;Yellow&quot;, label=&quot;CH score&quot;)
+axs[1,1].set_title(&quot;CH score&quot;)
+
+axs[2,0].plot(k_vals, coh_umass_scores, &quot;Green&quot;, label=&quot;Coh UMass&quot;)
+axs[2,0].set_title(&quot;Coh UMass&quot;)
+
+axs[2,1].plot(k_vals, coh_c_v_scores, &quot;Purple&quot;, label=&quot;Coh C_V&quot;)
+axs[2,1].set_title(&quot;Coh C_V&quot;)
+
+axs[3,0].plot(k_vals, coh_c_uci_scores, &quot;Pink&quot;, label=&quot;Coh C_UCI&quot;)
+axs[3,0].set_title(&quot;Coh C_UCI&quot;)
+
+axs[3,1].plot(k_vals, coh_c_npmi_scores, &quot;magenta&quot;, label=&quot;Coh C_NPMI&quot;)
+axs[3,1].set_title(&quot;Coh C_NPMI&quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;/images/lda_opt-22-10-26.png&quot; alt=&quot;Series of graphs&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Lower Perplexity scores are better while higher log likliehood is better.
+From these, it would seem like the better value for K is somewhere around 10.
+Of course, we have other metrics as well to examine. For silhouette score, the
+closer to 1 the better it is. Thus, it would seem that we want to have a value
+below 10. For CH Score, the higher it is the better so again, we seem to want
+to aim for lower than 10 topics.&lt;/p&gt;
+
+&lt;p&gt;Pivoting to Coherence, the goal is to maximize the coherence value.
+Thus, again, we see hints that we want to stick with fewer than 10 topics
+&lt;em&gt;or&lt;/em&gt; alternatively go far beyond 10 topics (somewhere between 30 and 40 topics
+perhaps for 3 coherence metrics).&lt;/p&gt;
+
+&lt;p&gt;We can always optimize further if we have the time and compute resources to do
+so. Since this is a fairly small set of data, we can go ahead and do so. In this
+case, I did so in the ipynb, but I’m not going to make you go through that.&lt;/p&gt;
+
+&lt;h4 id=&quot;tuning-parameters&quot;&gt;Tuning Parameters&lt;/h4&gt;
+&lt;p&gt;One thing I did in the ipynb that I won’t do here is I worked to tune the
+hyperparameters. That didn’t make much of a difference at all so that’s why
+I’m leaving it be here.&lt;/p&gt;
+
+&lt;h4 id=&quot;pyldavis-visualization&quot;&gt;PyLDAvis Visualization&lt;/h4&gt;
+&lt;p&gt;The final step once you’ve got some good candidates is to check them with PyLDAvis.
+You want to start by taking your candidate values in terms of hyperparameters
+and combine those with the k value(s) you determined are worth exploring. You
+then make some lda models and feed those into pyLDAvis. PyLDAvis can help you
+by letting you visually see how the topics fit together. You do this for each
+candidate parameter set.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-Python&quot;&gt;cand_vals = [(.1, .05),(.5, 1), (1, .75), (1,1)] # these are my best guess for where we see those spikes
+
+import pyLDAvis.sklearn
+
+lda1 = LatentDirichletAllocation(n_components=k, random_state=0, n_jobs=5,
+                           doc_topic_prior=cand_vals[0][0],
+                           topic_word_prior=cand_vals[0][1]) # making our lda model (w/hyper-params)
+lda1.fit(tf)
+
+pyLDAvis.enable_notebook()
+lda1_dash = pyLDAvis.sklearn.prepare(lda1, tf, tf_vectorizer)
+lda1_dash
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In my case, I saw that there were two topics that had overlap. The solution there
+is to adjust the number of topics down by the number of overlapping topics. In
+this case for me, I adjusted the K down to 7. Sadly, the result of PyLDAvis doesn’t
+lend itself to static imagery or I would include another picture. Hopefully, this
+gives a better idea of how to approach optimizing your K value. I’m thinking I may
+go ahead and redo this exercise with a public dataset so y’all can follow along.&lt;/p&gt;</content><author><name></name></author><category term="Topic Modeling" /><category term="Technical" /><summary type="html">Having already talked about why it’s hard to evaluate topic models, I wanted to walk through how I’ve ended up evaluating topic models when I’ve made them myself. This is from a project I’m still working on and I’m not sure it’s ethical for me to share the data, but the code can be easily repurposed. I’ll share the link to an ipynb with all of the code I used.</summary></entry><entry><title type="html">Philosophy to Practice - Part 1 (Meeting Needs)</title><link href="http://localhost:4000/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one.html" rel="alternate" type="text/html" title="Philosophy to Practice - Part 1 (Meeting Needs)" /><published>2022-10-25T00:00:00-04:00</published><updated>2022-10-25T00:00:00-04:00</updated><id>http://localhost:4000/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one</id><content type="html" xml:base="http://localhost:4000/non-technical/musings/2022/10/25/Philosophy-to-practice-pt-one.html">&lt;h1 id=&quot;moving-from-philosophy-to-practice&quot;&gt;Moving from Philosophy to practice&lt;/h1&gt;
 
 &lt;p&gt;As a short reminder, my data science philosophy can be boiled down to &lt;strong&gt;five&lt;/strong&gt;
 main points.&lt;/p&gt;

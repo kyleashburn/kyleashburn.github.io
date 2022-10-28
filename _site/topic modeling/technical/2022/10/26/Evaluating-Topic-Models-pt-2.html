@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Evaluating Topic Models - In Practice | Kyle’s Technical Blog</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Evaluating Topic Models - In Practice" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Having already talked about why it’s hard to evaluate topic models, I wanted to walk through how I’ve ended up evaluating topic models when I’ve made them myself. This is from a project I’m still working on and I’m not sure it’s ethical for me to share the data, but the code can be easily repurposed. I’ll share the link to an ipynb with all of the code I used." />
+<meta property="og:description" content="Having already talked about why it’s hard to evaluate topic models, I wanted to walk through how I’ve ended up evaluating topic models when I’ve made them myself. This is from a project I’m still working on and I’m not sure it’s ethical for me to share the data, but the code can be easily repurposed. I’ll share the link to an ipynb with all of the code I used." />
+<link rel="canonical" href="http://localhost:4000/topic%20modeling/technical/2022/10/26/Evaluating-Topic-Models-pt-2.html" />
+<meta property="og:url" content="http://localhost:4000/topic%20modeling/technical/2022/10/26/Evaluating-Topic-Models-pt-2.html" />
+<meta property="og:site_name" content="Kyle’s Technical Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-10-26T00:00:00-04:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Evaluating Topic Models - In Practice" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-10-26T00:00:00-04:00","datePublished":"2022-10-26T00:00:00-04:00","description":"Having already talked about why it’s hard to evaluate topic models, I wanted to walk through how I’ve ended up evaluating topic models when I’ve made them myself. This is from a project I’m still working on and I’m not sure it’s ethical for me to share the data, but the code can be easily repurposed. I’ll share the link to an ipynb with all of the code I used.","headline":"Evaluating Topic Models - In Practice","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/topic%20modeling/technical/2022/10/26/Evaluating-Topic-Models-pt-2.html"},"url":"http://localhost:4000/topic%20modeling/technical/2022/10/26/Evaluating-Topic-Models-pt-2.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Kyle&apos;s Technical Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Kyle&#39;s Technical Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/Personal_Website.html">Personal Website</a><a class="page-link" href="/LinkedIn.html">LinkedIn</a><a class="page-link" href="/portfolio.html">Portfolio</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Evaluating Topic Models - In Practice</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-10-26T00:00:00-04:00" itemprop="datePublished">Oct 26, 2022
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Having already talked about why it’s hard to evaluate topic models, I wanted to
+walk through how I’ve ended up evaluating topic models when I’ve made them myself.
+This is from a project I’m still working on and I’m not sure it’s ethical for me
+to share the data, but the code can be easily repurposed. I’ll share the link to
+an ipynb with all of the code I used.</p>
+
+<h4 id="caveat">Caveat</h4>
+<p>This is all done with SKLearn’s LDA implementation so it goes without saying
+that you can’t just plug this all into say Gensim’s approach and use it without
+any modification.</p>
+
+<h4 id="warnings">Warning(s)</h4>
+<p><strong>This is an incredibly slow process. Don’t expect it to be fast, especially on
+larger data.</strong> You have been warned.</p>
+
+<p>Because this is from a personal project where I have to keep the data private,
+I can’t share the data. Thus, you can’t follow along with me. I’m planning on
+finding (or making) a good public dataset that I write another post about so you
+can follow along.</p>
+
+<h4 id="starting-with-the-first-imports-and-why">Starting with the first imports and why</h4>
+<pre><code class="language-Python">import pandas as pd
+import numpy as np
+from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+</code></pre>
+<p>We’re using Pandas as the wrapper for the handling the data. We’re bringing
+Numpy to be safe because I believe it’s better to have it than not. Then we’ve
+got the SKLearn LDA and vectorizers.</p>
+
+<h4 id="the-horribly-messy-pre-processing-step">The horribly messy pre-processing step</h4>
+<pre><code class="language-Python">import string
+punct = string.punctuation
+punct = punct.replace("#", "‘")
+ #removing hashtag and replacing with a stray type of apostrophe that broke through
+
+import nltk
+from nltk.stem import WordNetLemmatizer
+wordnet_lemmatizer = WordNetLemmatizer()
+stopwords = nltk.corpus.stopwords.words("english")
+import contractions
+
+# defining a pre-proc function that will tokenize text
+def pre_proc(x):
+    # splitting contractions before splitting up the terms =&gt; helps with pruning
+    # trying to expand the contractions
+    try:    
+        x = contractions.fix(x)
+
+    # if that fails, trying to use unidecode to correct
+    except IndexError:
+        # trying to unidecode
+        try:
+            x = contractions.fix(unidecode(x))
+
+        except Exception as eror: # printing excpetion, and input leading to that
+            print("Exception is:", error)
+            print("Exception on:")
+            print(x)        
+
+    x = x.split() # splitting the terms up
+
+    x = [word for word in x if len(word)&gt;0] # removing the empty items
+
+    x = [word.lower() for word in x] # lowercasing the terms
+
+    # removing emoji &amp; conveniently, some punctuation
+    x = [word.encode("ascii", "ignore").decode("ascii") for word in x]
+
+    # removing punctuation (with the exception of #)
+    x = [word.translate(str.maketrans("","",punct)) for word in x]    
+
+
+    x = [word for word in x if len(word)&gt;0] # removing the empty items
+
+    x = [word for word in x if word not in stopwords]     # removing stopwords
+
+    x = [wordnet_lemmatizer.lemmatize(word) for word in x]     # lemmatization
+
+    x = " ".join(x)      # rejoining the list back into a string   
+
+    return x
+</code></pre>
+<p>This is kinda messy but it’s what I’ve used on multiple occasions. It works for
+my purposes here and it worked in my masters paper. The main thing to note is we
+want to return a string that has been cleaned because that’s what it takes to
+ensure some of the metrics work properly.</p>
+
+<h4 id="running-the-pre-processing-reading-data-vectorizing">Running the pre-processing, reading data, vectorizing</h4>
+<pre><code class="language-Python">chapters = pd.read_json("book_chapters.jl", lines=True) # reading data
+
+chapters["clean"] = chapters["chapt_text"].apply(pre_proc)
+
+tf_vectorizer = CountVectorizer(
+    max_df=0.95, min_df=.1, stop_words="english"
+)
+
+tf = tf_vectorizer.fit_transform(chapters["clean"])
+</code></pre>
+
+<h4 id="setting-everything-up-to-search-for-optimal-k">Setting everything up to search for optimal K</h4>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">k_vals</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">40</span><span class="p">]</span> <span class="c1"># decent spread of k-vals
+</span>
+<span class="c1"># making lists to hold the scores for each of these topic model values
+</span><span class="n">perp_scores</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="n">ll_scores</span> <span class="o">=</span><span class="nb">list</span><span class="p">()</span>
+<span class="n">silh_scores</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="n">ch_scores</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="n">coh_umass_scores</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="n">coh_c_v_scores</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="n">coh_c_uci_scores</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="n">coh_c_npmi_scores</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">chapters</span><span class="p">[</span><span class="s">"clean"</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="nb">str</span><span class="p">.</span><span class="n">split</span><span class="p">)</span> <span class="c1"># we need this for one of the metrics
+</span>
+<span class="kn">import</span> <span class="nn">time</span> <span class="c1"># we need this to ensure we have all the timings
+</span></code></pre></div></div>
+
+<h4 id="running-multiple-lda-models-and-getting-the-metrics-for-search">Running multiple LDA models and getting the metrics for search</h4>
+<pre><code class="language-Python"># importing our metrics
+from sklearn.metrics import silhouette_score
+from sklearn.metrics import calinski_harabasz_score
+from tmtoolkit.topicmod.evaluate import metric_coherence_gensim
+
+
+start_time = time.time()  #timing is everything
+
+for k in k_vals:
+    loop_start = time.time()
+    lda = LatentDirichletAllocation(n_components=k, random_state=0, n_jobs=5) # making our lda model
+
+    lda.fit(tf) # fitting it to our tf
+
+    # getting our labels for the silhouette score and CH
+    labels = lda.transform(tf)
+    doc_labels = [label.argmax() for label in labels] # list comp which gives labels for each doc
+
+    # getting our metrics next
+    perp_scores.append(lda.perplexity(tf))
+    ll_scores.append(lda.score(tf))
+    silh_scores.append(silhouette_score(tf, doc_labels))
+    ch_scores.append(calinski_harabasz_score(tf.toarray(), doc_labels))
+
+    # coherence scores
+    coh_umass_scores.append(metric_coherence_gensim(measure='u_mass', # the measure we're using
+                        top_n=25,
+                        topic_word_distrib=lda.components_, # the components of the lda count as
+                        dtm=tf, # the term frequency
+                        vocab=np.array([x for x in tf_vectorizer.vocabulary_.keys()]), # pass in vectorizer
+                        texts=tokens, # pass in list of tokenized texts -&gt; needs to match vocab -&gt; if using umass, doesn't matter at all
+                        return_mean=True)) # return the mean coherence score for the model
+
+    coh_c_v_scores.append(metric_coherence_gensim(measure='c_v', # the measure we're using
+                        top_n=25,
+                        topic_word_distrib=lda.components_, # the components of the lda count as
+                        dtm=tf, # the term frequency
+                        vocab=np.array([x for x in tf_vectorizer.vocabulary_.keys()]), # pass in vectorizer
+                        texts=tokens, # pass in list of tokenized texts -&gt; needs to match vocab -&gt; if using umass, doesn't matter at all
+                        return_mean=True))
+
+    coh_c_uci_scores.append(metric_coherence_gensim(measure='c_uci', # the measure we're using
+                        top_n=25,
+                        topic_word_distrib=lda.components_, # the components of the lda count as
+                        dtm=tf, # the term frequency
+                        vocab=np.array([x for x in tf_vectorizer.vocabulary_.keys()]), # pass in vectorizer
+                        texts=tokens, # pass in list of tokenized texts -&gt; needs to match vocab -&gt; if using umass, doesn't matter at all
+                        return_mean=True))
+
+    coh_c_npmi_scores.append(metric_coherence_gensim(measure='c_npmi', # the measure we're using
+                        top_n=25,
+                        topic_word_distrib=lda.components_, # the components of the lda count as
+                        dtm=tf, # the term frequency
+                        vocab=np.array([x for x in tf_vectorizer.vocabulary_.keys()]), # pass in vectorizer
+                        texts=tokens, # pass in list of tokenized texts -&gt; needs to match vocab -&gt; if using umass, doesn't matter at all
+                        return_mean=True))
+
+
+
+    loop_end = time.time()
+    print("loop took", loop_end - loop_start, "seconds to run")
+end_time = time.time()
+
+print("total time", end_time - start_time, "seconds")
+</code></pre>
+<p>I know that’s a bit messy and my comments mean that it doesn’t all fit on there,
+but the gist is we’re going through and grabbing the metrics for each time we
+build an LDA topic model.</p>
+
+<h4 id="comparing-the-results">Comparing the results</h4>
+
+<pre><code class="language-Python">import matplotlib.pyplot as plt
+
+plt.rcParams['figure.dpi'] = 150 # ensuring we have a good size for vectorizers
+
+fig, axs = plt.subplots(4, 2)
+fig.suptitle("Metrics vs. K")
+fig.tight_layout(pad=1.5)
+
+
+axs[0,0].plot(k_vals, perp_scores, "blue", label="perplexity")
+axs[0,0].set_title("perplexity")
+
+axs[0,1].plot(k_vals, ll_scores, "red", label="log likliehood")
+axs[0,1].set_title("log likliehood")
+
+axs[1,0].plot(k_vals, silh_scores, "Orange" , label= "silhouette score")
+axs[1,0].set_title("silhouette score")
+
+axs[1,1].plot(k_vals, ch_scores, "Yellow", label="CH score")
+axs[1,1].set_title("CH score")
+
+axs[2,0].plot(k_vals, coh_umass_scores, "Green", label="Coh UMass")
+axs[2,0].set_title("Coh UMass")
+
+axs[2,1].plot(k_vals, coh_c_v_scores, "Purple", label="Coh C_V")
+axs[2,1].set_title("Coh C_V")
+
+axs[3,0].plot(k_vals, coh_c_uci_scores, "Pink", label="Coh C_UCI")
+axs[3,0].set_title("Coh C_UCI")
+
+axs[3,1].plot(k_vals, coh_c_npmi_scores, "magenta", label="Coh C_NPMI")
+axs[3,1].set_title("Coh C_NPMI")
+</code></pre>
+<p><img src="/images/lda_opt-22-10-26.png" alt="Series of graphs" /></p>
+
+<p>Lower Perplexity scores are better while higher log likliehood is better.
+From these, it would seem like the better value for K is somewhere around 10.
+Of course, we have other metrics as well to examine. For silhouette score, the
+closer to 1 the better it is. Thus, it would seem that we want to have a value
+below 10. For CH Score, the higher it is the better so again, we seem to want
+to aim for lower than 10 topics.</p>
+
+<p>Pivoting to Coherence, the goal is to maximize the coherence value.
+Thus, again, we see hints that we want to stick with fewer than 10 topics
+<em>or</em> alternatively go far beyond 10 topics (somewhere between 30 and 40 topics
+perhaps for 3 coherence metrics).</p>
+
+<p>We can always optimize further if we have the time and compute resources to do
+so. Since this is a fairly small set of data, we can go ahead and do so. In this
+case, I did so in the ipynb, but I’m not going to make you go through that.</p>
+
+<h4 id="tuning-parameters">Tuning Parameters</h4>
+<p>One thing I did in the ipynb that I won’t do here is I worked to tune the
+hyperparameters. That didn’t make much of a difference at all so that’s why
+I’m leaving it be here.</p>
+
+<h4 id="pyldavis-visualization">PyLDAvis Visualization</h4>
+<p>The final step once you’ve got some good candidates is to check them with PyLDAvis.
+You want to start by taking your candidate values in terms of hyperparameters
+and combine those with the k value(s) you determined are worth exploring. You
+then make some lda models and feed those into pyLDAvis. PyLDAvis can help you
+by letting you visually see how the topics fit together. You do this for each
+candidate parameter set.</p>
+
+<pre><code class="language-Python">cand_vals = [(.1, .05),(.5, 1), (1, .75), (1,1)] # these are my best guess for where we see those spikes
+
+import pyLDAvis.sklearn
+
+lda1 = LatentDirichletAllocation(n_components=k, random_state=0, n_jobs=5,
+                           doc_topic_prior=cand_vals[0][0],
+                           topic_word_prior=cand_vals[0][1]) # making our lda model (w/hyper-params)
+lda1.fit(tf)
+
+pyLDAvis.enable_notebook()
+lda1_dash = pyLDAvis.sklearn.prepare(lda1, tf, tf_vectorizer)
+lda1_dash
+</code></pre>
+
+<p>In my case, I saw that there were two topics that had overlap. The solution there
+is to adjust the number of topics down by the number of overlapping topics. In
+this case for me, I adjusted the K down to 7. Sadly, the result of PyLDAvis doesn’t
+lend itself to static imagery or I would include another picture. Hopefully, this
+gives a better idea of how to approach optimizing your K value. I’m thinking I may
+go ahead and redo this exercise with a public dataset so y’all can follow along.</p>
+
+  </div><a class="u-url" href="/topic%20modeling/technical/2022/10/26/Evaluating-Topic-Models-pt-2.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Kyle&#39;s Technical Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Kyle&#39;s Technical Blog</li><li><a class="u-email" href="mailto:kyle@ashburn.tech">kyle@ashburn.tech</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/kyleashburn"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">kyleashburn</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>This is just a little blog I&#39;m running in the hopes of documenting the hard lessons I had to learn. I&#39;m hoping this will provide a bit of help to people on the same path as I was.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

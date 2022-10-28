@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Reading Levels with Textstat | Kyle’s Technical Blog</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Reading Levels with Textstat" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Reading Levels with Textstat There are lot of things you can do with textual data. You can do topic modeling, PoS tagging, sentiment analysis, stylometry, and term frequency. Something else you can do is reading level analysis. Now, most of the time, this might not have too much utility. However, you might find it a useful feature in feature engineering." />
+<meta property="og:description" content="Reading Levels with Textstat There are lot of things you can do with textual data. You can do topic modeling, PoS tagging, sentiment analysis, stylometry, and term frequency. Something else you can do is reading level analysis. Now, most of the time, this might not have too much utility. However, you might find it a useful feature in feature engineering." />
+<link rel="canonical" href="http://localhost:4000/technical/textual%20data/2022/10/27/reading-levels-with-textstat.html" />
+<meta property="og:url" content="http://localhost:4000/technical/textual%20data/2022/10/27/reading-levels-with-textstat.html" />
+<meta property="og:site_name" content="Kyle’s Technical Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-10-27T00:00:00-04:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Reading Levels with Textstat" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2022-10-27T00:00:00-04:00","datePublished":"2022-10-27T00:00:00-04:00","description":"Reading Levels with Textstat There are lot of things you can do with textual data. You can do topic modeling, PoS tagging, sentiment analysis, stylometry, and term frequency. Something else you can do is reading level analysis. Now, most of the time, this might not have too much utility. However, you might find it a useful feature in feature engineering.","headline":"Reading Levels with Textstat","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/technical/textual%20data/2022/10/27/reading-levels-with-textstat.html"},"url":"http://localhost:4000/technical/textual%20data/2022/10/27/reading-levels-with-textstat.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Kyle&apos;s Technical Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Kyle&#39;s Technical Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/Personal_Website.html">Personal Website</a><a class="page-link" href="/LinkedIn.html">LinkedIn</a><a class="page-link" href="/portfolio.html">Portfolio</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Reading Levels with Textstat</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-10-27T00:00:00-04:00" itemprop="datePublished">Oct 27, 2022
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h1 id="reading-levels-with-textstat">Reading Levels with Textstat</h1>
+<p>There are lot of things you can do with textual data. You can do topic modeling,
+PoS tagging, sentiment analysis, stylometry, and term frequency. Something else
+you can do is reading level analysis. Now, most of the time, this might not have
+too much utility. However, you might find it a useful feature in feature engineering.</p>
+
+<p>One of the nice Python libraries I found for calculating reading levels is Textstat.
+There are a number of different tutorials on this topic and to be honest, I can’t
+say that they are insufficient. Indeed, the documentation for Textstat answers
+most questions you could have in terms of use. However, I thought it would be nice
+for me to write up my own little guide to the subject because I’ve noticed a few
+things.</p>
+
+<p>Throughout this, I’m using 10 ebooks I
+downloaded from the Guttenberg Project. I chose the 10 most popular books over
+the last 30 days. I had to do this manually because they strongly discourage
+using robots (they will ban your IP address).</p>
+
+<p>I started by combining those text files and doing a bit of light cleaning of them.
+That code is in a separate ipynb that I’ve uploaded and I’ve linked to <a href="">here</a>.
+I’ve included everything we’re doing here in another ipynb located <a href="">here</a>.</p>
+
+<p>We start by reading in the data after importing our libraries.</p>
+<pre><code class="language-Python">import pandas as pd
+import textstat as ts
+
+books = pd.read_json("top-10-projbg-books.ndjson", lines=True)
+</code></pre>
+
+<p>Our first thing we’re going to check is the Flesch Reading Ease Score and Flesch
+Kincaid Grade Level (based off the Flesch Reading Ease). You can read more about
+them <a href="https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests">on Wikipedia</a>,
+but they were originally meant to provide a way for evaluating textbooks.</p>
+<pre><code class="language-Python">%%time
+books["fl_ease"] = books["text"].apply(ts.flesch_reading_ease)
+</code></pre>
+<pre><code class="language-Python">%%time
+books["fl_kn_grd"] = books["text"].apply(ts.flesch_kincaid_grade)
+</code></pre>
+
+<p>Our next two measures work differently and have different assumptions. They try
+to represent the years of education it would take to read a work. The <a href="https://en.wikipedia.org/wiki/Gunning_fog_index">Gunning fog
+index</a> and the <a href="https://en.wikipedia.org/wiki/SMOG">SMOG grade</a>
+. These are both actually better measures than Flesch based scores when it comes
+to some cases. Generally, they perform better with healthcare texts. Though, I suspect
+a good bit of that is because they consistently return higher levels in my experience.</p>
+<pre><code class="language-Python">%%time
+books["gunning"] = books["text"].apply(ts.gunning_fog)
+</code></pre>
+
+<pre><code class="language-Python">%%time
+books["smog"] = books["text"].apply(ts.smog_index)
+</code></pre>
+
+<p>Our next two measures are different still. <a href="https://en.wikipedia.org/wiki/Automated_readability_index">Automated Readability Index</a> is computed on a per-character basis
+while the <a href="https://en.wikipedia.org/wiki/Dale%E2%80%93Chall_readability_formula">Dale-Chall</a> involves a list of “easy” words. Both result in an approximate grade level of a text.</p>
+<pre><code class="language-Python">%%time
+books["ari"] = books["text"].apply(ts.automated_readability_index)
+</code></pre>
+<pre><code class="language-Python">%%time
+books["dale_chall"] = books["text"].apply(ts.dale_chall_readability_score)
+</code></pre>
+
+<p>The final readability measure is an ensemble measure that is unique to Textstat.
+I think it can be useful on occasion, though it is considerably slower than the
+other options (since it runs all of them).</p>
+<pre><code class="language-Python">%%time
+books["ensemble"] = books["text"].apply(ts.text_standard, float_output=True)
+</code></pre>
+
+<h1 id="other-metrics">Other Metrics</h1>
+<p>There are two other metrics that Textstat has set up. One of those is the <a href="https://www.angelfire.com/nd/nirmaldasan/journalismonline/fpetge.html">McAlpine
+EFLAW</a> score
+that is meant to measure readability for a person who isn’t a native English
+speaker. The other is a reading speed calculated on a per character basis. Now I
+have concerns about the validity of the reading speed and think it’s too optimistic.
+Furthermore, it’s difficult to determine what the per-character speed should be.
+For myself, I relied on <a href="https://iovs.arvojournals.org/article.aspx?articleid=2166061">Trauzettel-Klosinski et al, 2012</a> and went with 16.45 ms per character. In this case,
+the documentation isn’t clear, but the end result is in seconds to read the work.
+I had to read through the repo to figure that part out.</p>
+
+<pre><code class="language-Python">%%time
+books["eflaw"] = books["text"].apply(ts.mcalpine_eflaw)
+</code></pre>
+
+<pre><code class="language-Python">%%time
+books["reading_time"] = books["text"].apply(ts.reading_time, ms_per_char=16.45)
+# mean time per character per Trauzettel-Klosinski et al, 2012
+</code></pre>
+<p><img src="/images/reading_levels_table.jpg" alt="table output" /></p>
+
+<p>As we can see from the end result of our work here, I have some thoughts.
+I’m not sure about how well these are performing here. I don’t know if Shakespeare
+is actually at the 6th grade level in general. I’m especially unsure about the Dale-Chall
+score of 1.2 which would indicate an average 4th grader can easily understand it.
+Of course, these shouldn’t be relied on as a gold standard but rather a hint of a
+direction that things might be.</p>
+
+<p>Different formulas lead to different results unsurprising to think about. Thus,
+in this case, the text standard is probably our best bet. This is because it is
+rooted in finding the consensus of the scores. Of course, “best” is probably a
+ bit ambiguous in a lot of respects. For one thing, the metric needs to be one that
+ is understood and accepted. For another, it needs to be one that is considered
+ reliable. It’s important to understand the context which exists for each of these
+ metrics.</p>
+
+<p>The usual Flesch-Kincaid formula can overestimate readability in certain contexts.
+ The SMOG index is better used for technical documents in a lot of respects and
+  is popular in assessing the readability of health documents. However, syllable
+  based readability tests have their own issues, short words may confuse people
+  if they are rare. Other approaches can be found in the Dale-Chall formula that
+  has a list of words that 4th grade students can understand and anything off the
+  list is considered difficult. In general though, any metric here is probably a
+  “good enough” metric in general. Specific use cases require specific testing to
+  ensure reliability and validity of a measure.</p>
+
+  </div><a class="u-url" href="/technical/textual%20data/2022/10/27/reading-levels-with-textstat.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Kyle&#39;s Technical Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Kyle&#39;s Technical Blog</li><li><a class="u-email" href="mailto:kyle@ashburn.tech">kyle@ashburn.tech</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/kyleashburn"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">kyleashburn</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>This is just a little blog I&#39;m running in the hopes of documenting the hard lessons I had to learn. I&#39;m hoping this will provide a bit of help to people on the same path as I was.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
