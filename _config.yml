@@ -36,6 +36,8 @@ github_username: kyleashburn
 theme: minima
 plugins:
   - jekyll-feed
+  - jekyll-redirect-from
+
 
 # this controls what pages appear on the nav bar
 header_pages:
