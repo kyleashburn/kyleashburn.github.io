@@ -1,4 +1,5 @@
 ---
+layout: redirect
 title: test
 redirect_to: wikipedia.org
 ---
